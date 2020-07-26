@@ -136,17 +136,33 @@ render() {
 }
 
 class SignOutScreen extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      search: '',
+      data: signedin,
+    }
+  }
+
   render() {
     if (!studying) {
     return (
       <View style={styles.container}>
-      <Button title="You Are Not Signed In"/>
+      <Text style={styles.text}>You are not signed into any buildings.</Text>
       </View>
     );
   } else {
     return (
       <View style={styles.container}>
-        <Button title="Sign out of "/>
+      <Text style={styles.text}>Sign out of: </Text>
+      <FlatList
+        data={this.state.data}
+        renderItem={({item}) => (<Button
+          title = {item.key}
+           />)
+        }
+      />
       </View>
     );
   }
