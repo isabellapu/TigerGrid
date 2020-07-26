@@ -56,6 +56,30 @@ function HomeScreen({ navigation }) {
   );
 }
 
+function compareValues(key, order = 'asc') {
+  return function innerSort(a, b) {
+    if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+      // property doesn't exist on either object
+      return 0;
+    }
+
+    const varA = (typeof a[key] === 'string')
+      ? a[key].toUpperCase() : a[key];
+    const varB = (typeof b[key] === 'string')
+      ? b[key].toUpperCase() : b[key];
+
+    let comparison = 0;
+    if (varA > varB) {
+      comparison = 1;
+    } else if (varA < varB) {
+      comparison = -1;
+    }
+    return (
+      (order === 'desc') ? (comparison * -1) : comparison
+    );
+  };
+}
+
 class SignInScreen extends React.Component {
 
 constructor(props) {
@@ -116,6 +140,7 @@ constructor(props) {
     buildings.find(x => x.key === name).status = 'taken';
     studying = true;
     signedin.push(buildings.find(x => x.key === name));
+    signedin.sort(compareValues('key'));
     this.searchFilterFunction(this.state.search);
   }
 
@@ -145,6 +170,32 @@ class SignOutScreen extends React.Component {
     }
   }
 
+  onPressSignOut(name) {
+    Alert.alert(
+      name,
+      "Do you want to sign-out of " + name + "?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Sign-Out", onPress: () => this.signOut(name)}
+      ],
+      { cancelable: false }
+    );
+  }
+
+  signOut = (name) => {
+    buildings.find(x => x.key === name).status = 'open';
+    signedin = signedin.filter(item => item.key !== name)
+    if (signedin.length < 1) studying = false;
+    signedin.sort(compareValues('key'));
+    this.setState({
+      data: signedin,
+    });
+  }
+
   render() {
     if (!studying) {
     return (
@@ -160,6 +211,7 @@ class SignOutScreen extends React.Component {
         data={this.state.data}
         renderItem={({item}) => (<Button
           title = {item.key}
+          onPress={() => this.onPressSignOut(item.key)}
            />)
         }
       />
