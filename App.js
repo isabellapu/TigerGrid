@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import * as React from 'react';
-import { StyleSheet, Button, View, Text, ScrollView, FlatList } from 'react-native';
+import { StyleSheet, Button, View, Text, ScrollView, FlatList, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Constants from 'expo-constants';
@@ -43,7 +43,7 @@ function HomeScreen({ navigation }) {
       />
       <Button
         title="View All Rooms"
-        onPress={() => navigation.navigate('View')}
+        onPress={() => navigation.navigate('View Rooms')}
       />
     </View>
   );
@@ -55,7 +55,11 @@ constructor(props) {
   super(props);
   this.state = {
     search: '',
-    data: buildings,
+    data: buildings.filter(function(item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.status;
+      return(itemData === 'open');
+    }),
   }
 }
 
@@ -73,8 +77,9 @@ constructor(props) {
     const newData = buildings.filter(function(item) {
       //applying filter for the inserted text in search bar
       const itemData = item.key ? item.key.toUpperCase() : ''.toUpperCase();
+      const openData = item.status;
       const textData = text.toUpperCase();
-      return itemData.indexOf(textData) > -1;
+      return itemData.indexOf(textData) > -1 && openData === 'open';
     });
     this.setState({
       //setting the filtered newData on datasource
@@ -84,12 +89,36 @@ constructor(props) {
     });
   }
 
+  onPressSignIn(name) {
+    Alert.alert(
+      name,
+      "Do you want to sign-in to " + name + "?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "Sign-In", onPress: () => this.changeStatus(name)}
+      ],
+      { cancelable: false }
+    );
+  }
+
+  changeStatus(name) {
+    buildings.find(x => x.key === name).status = 'taken';
+    this.searchFilterFunction(this.state.search);
+  }
+
 render() {
   return (
     <View style={styles.container}>
       <FlatList
         data={this.state.data}
-        renderItem={({item}) => (<Button title = {item.key} />)}
+        renderItem={({item}) => (<Button
+          title = {item.key}
+          onPress={() => this.onPressSignIn(item.key)} />)
+        }
         ListHeaderComponent={this.renderHeader}
       />
     </View>
@@ -98,11 +127,88 @@ render() {
 }
 
 class ViewScreen extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      search: '',
+      data: buildings
+      // closedData: buildings.filter(function(item) {
+      //   //applying filter for the inserted text in search bar
+      //   const itemData = item.status;
+      //   return(itemData === 'taken');
+      // }),
+    }
+  }
+
+  renderHeader = () => {
+    return [
+      <SearchBar
+        placeholder="Type Here..."
+        onChangeText={text => this.searchFilterFunction(text)}
+        onClear={text => this.searchFilterFunction('')}
+        value={this.state.search}
+      />,
+      <View style={{ flexDirection: "row" ,justifyContent: 'space-evenly' }}>
+       <View style={styles.buttonContainer}>
+        <Button title="Show Open"
+        onPress={() => this.showOpen}/>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Show Taken"
+        onPress={() => this.showTaken}/>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Show All"/>
+      </View>
+    </View>
+  ]
+  };
+
+  showOpen() {
+    newData = buildings.filter(function(item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.status;
+      return(itemData === 'open');
+    });
+    this.setState({
+      data: newData,
+    });
+  }
+
+  showTaken() {
+    newData = buildings.filter(function(item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.status;
+      return(itemData === 'taken');
+    });
+    this.setState({
+      data: newData,
+    });
+  }
+
+  searchFilterFunction(text) {
+    //passing the inserted text in textinput
+    const newData = buildings.filter(function(item) {
+      //applying filter for the inserted text in search bar
+      const itemData = item.key ? item.key.toUpperCase() : ''.toUpperCase();
+      const openData = item.status;
+      const textData = text.toUpperCase();
+      return itemData.indexOf(textData) > -1 && openData === 'open';
+    });
+    this.setState({
+      //setting the filtered newData on datasource
+      //After setting the data it will automatically re-render the view
+      data: newData,
+      search:text,
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <FlatList
-          data={buildings}
+          data={this.state.data}
           renderItem={({item}) => (<Text style={styles.text}>{item.key}, {item.status}</Text>)}
           ListHeaderComponent={this.renderHeader}
         />
@@ -119,7 +225,7 @@ function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Sign-In" component={SignInScreen} />
-        <Stack.Screen name="View" component={ViewScreen} />
+        <Stack.Screen name="View Rooms" component={ViewScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -127,8 +233,12 @@ function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: Constants.statusBarHeight,
+    flexDirection: 'row',
+  },
+  buttonContainer: {
+    width: '31%',
+    height: 40,
+    backgroundColor: 'pink',
   },
   scrollView: {
     backgroundColor: 'pink',
@@ -136,6 +246,11 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 24,
+    color: 'green'
+  },
+  takenText: {
+    fontSize: 24,
+    color: 'black'
   },
   container: {
    flex: 1,
