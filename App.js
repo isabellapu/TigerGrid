@@ -34,12 +34,19 @@ const buildings = [
   {key: 'V Building', status: 'open'},
 ];
 
+let studying = false;
+let signedin = [];
+
 function HomeScreen({ navigation }) {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Button
         title="Sign Into a Room"
         onPress={() => navigation.navigate('Sign-In')}
+      />
+      <Button
+        title="Sign Out of a Room"
+        onPress={() => navigation.navigate('Sign-Out')}
       />
       <Button
         title="View All Rooms"
@@ -107,6 +114,8 @@ constructor(props) {
 
   changeStatus(name) {
     buildings.find(x => x.key === name).status = 'taken';
+    studying = true;
+    signedin.push(buildings.find(x => x.key === name));
     this.searchFilterFunction(this.state.search);
   }
 
@@ -126,13 +135,31 @@ render() {
 }
 }
 
+class SignOutScreen extends React.Component {
+  render() {
+    if (!studying) {
+    return (
+      <View style={styles.container}>
+      <Button title="You Are Not Signed In"/>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.container}>
+        <Button title="Sign out of "/>
+      </View>
+    );
+  }
+  }
+}
+
 class ViewScreen extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       search: '',
-      data: buildings
+      data: buildings,
       // closedData: buildings.filter(function(item) {
       //   //applying filter for the inserted text in search bar
       //   const itemData = item.status;
@@ -152,21 +179,22 @@ class ViewScreen extends React.Component {
       <View style={{ flexDirection: "row" ,justifyContent: 'space-evenly' }}>
        <View style={styles.buttonContainer}>
         <Button title="Show Open"
-        onPress={() => this.showOpen}/>
+        onPress={this.showOpen}/>
       </View>
       <View style={styles.buttonContainer}>
         <Button title="Show Taken"
-        onPress={() => this.showTaken}/>
+        onPress={this.showTaken}/>
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="Show All"/>
+        <Button title="Show All"
+        onPress={this.showAll}/>
       </View>
     </View>
   ]
   };
 
-  showOpen() {
-    newData = buildings.filter(function(item) {
+  showOpen = () => {
+    const newData = buildings.filter(function(item) {
       //applying filter for the inserted text in search bar
       const itemData = item.status;
       return(itemData === 'open');
@@ -176,14 +204,20 @@ class ViewScreen extends React.Component {
     });
   }
 
-  showTaken() {
-    newData = buildings.filter(function(item) {
+  showTaken = () => {
+    const newData = buildings.filter(function(item) {
       //applying filter for the inserted text in search bar
       const itemData = item.status;
       return(itemData === 'taken');
     });
     this.setState({
       data: newData,
+    });
+  }
+
+  showAll = () => {
+    this.setState({
+      data: buildings,
     });
   }
 
@@ -225,6 +259,7 @@ function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Sign-In" component={SignInScreen} />
+        <Stack.Screen name="Sign-Out" component={SignOutScreen} />
         <Stack.Screen name="View Rooms" component={ViewScreen} />
       </Stack.Navigator>
     </NavigationContainer>
