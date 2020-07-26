@@ -103,7 +103,7 @@ class ViewScreen extends React.Component {
       <View style={styles.container}>
         <FlatList
           data={buildings}
-          renderItem={({item}) => (<Text style={styles.text}>{item.key}</Text>)}
+          renderItem={({item}) => (<Text style={styles.text}>{item.key}, {item.status}</Text>)}
           ListHeaderComponent={this.renderHeader}
         />
       </View>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   text: {
-    fontSize: 42,
+    fontSize: 24,
   },
   container: {
    flex: 1,
