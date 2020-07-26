@@ -1,7 +1,12 @@
 {
   "expo": {
+<<<<<<< HEAD
     "name": "AwesomeProject",
     "slug": "AwesomeProject",
+=======
+    "name": "MyApp",
+    "slug": "MyApp",
+>>>>>>> a89d2ed1b41b16bbd3a2dad2ab6b5791a700194c
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

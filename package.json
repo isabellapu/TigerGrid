@@ -16,12 +16,20 @@
     "react": "~16.11.0",
     "react-dom": "~16.11.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-38.0.2.tar.gz",
+<<<<<<< HEAD
+=======
+    "react-native-elements": "^2.0.4",
+>>>>>>> a89d2ed1b41b16bbd3a2dad2ab6b5791a700194c
     "react-native-gesture-handler": "~1.6.0",
     "react-native-reanimated": "~1.9.0",
     "react-native-safe-area-context": "~3.0.7",
     "react-native-screens": "~2.9.0",
+<<<<<<< HEAD
     "react-native-web": "~0.11.7",
     "react-navigation": "^4.4.0"
+=======
+    "react-native-web": "~0.11.7"
+>>>>>>> a89d2ed1b41b16bbd3a2dad2ab6b5791a700194c
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
